@@ -11,6 +11,7 @@ This app is a Discord bot coded in Python whose job is to create posts on a Blog
 - Basic permissions support, only uploads from users with a role
 - Semi-permanent killswitch
 - Automatically delete posts if the original message gets deleted
+- Auto scanning for missing posts in case bot went offline (v12+)
 
 # Limitations
 - The bot's code only supports a single server and a single blog. Upgrading it to support multiple servers / blogs shouldn't be difficult, just need to add a guild and blogid to all files and operations as well as multiple roles (one per server). Considering the niche nature of this kind of a bot, multi server support is the lowest on my priority list, if at all.
@@ -30,9 +31,10 @@ This app is a Discord bot coded in Python whose job is to create posts on a Blog
 11. Edit channelid.txt with a channel ID the bot will listen to
 12. Start the bot
 13. Send a message with a video file attachment in the listening channel
-14. Open a webpage that has appeared in the bot's console, log in with your Google account and grant access to Blogger API
-15. Shut down the bot, set loginDebug to false
-16. Start the bot
+14. Send a valid tags command
+15. Open a webpage that has appeared in the bot's console, log in with your Google account and grant access to Blogger API
+16. Shut down the bot, set loginDebug to false
+17. Start the bot
 
 # Updates?
 I plan on releasing updates eventually. My goal is to make everything as documented and as user friendly as possible. Some of the things plannned: an sql database instead of text files, a proper config file and very maybe a multi server support. However, because right now I don't need any extra features, I can't promise I will release any updates. There's a possibility of me losing interest in the project, most likely because I won't need it anymore and I'd rather create something new that will be of value to me rather than maintain a project that doesn't benefit me at all. Chances are, if you're reading this it means I published the bot because I don't use / need it anymore. And the most important part is, a bot like this is extremely niche, the amount of people / servers that could benefit from it or would like to use it is close to zero.
