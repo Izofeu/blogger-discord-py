@@ -78,6 +78,8 @@ def authenticate():
     return auth
 
 def submit(text, imagelink, videolink, uploader, tags):
+    if uploadDisabled:
+        return False, False
     try:
         blogger = authenticate()
         if not blogger:
@@ -241,6 +243,7 @@ help = ("Help menu:\n"
         "A ]switch <id> - Change listening channel.\n"
         "A ]exit - Shut down the bot - this is semi-permanent, only the bot owner can restart the bot, use only in case of emergency.\n"
         "A ]setid <id> - Set the id of a role permitted to post on the blog.\n"
+        "A ]scan - Checks the channel for last 24 messages and publishes unpublished videos.\n"
         "U ]enabletags / ]disabletags - Toggle tagging system.\n"
         "U ]skip - Skips entering tags.\n"
         "U ]tags <tags separated by commas> - Publish a pending post with selected tags.\n"
@@ -342,6 +345,86 @@ async def on_message(message):
             uploadPending = False
             await message.channel.send("New blog post has successfully been posted! " + str(result_url))
         return
+    
+    
+    
+    if message.content.startswith("]scan"):
+        if message.author.id not in master and not isserveradmin(message):
+            await message.channel.send(permerror)
+            return
+        # remember to do +1 to account for command submission message
+        glimit = 5
+        mesarr = []
+
+        cntr = 0
+        async for smessage in message.channel.history(limit = glimit, oldest_first = False):
+            cntr += 1
+            mesarr.append(smessage)
+
+        if cntr != glimit:
+            await message.channel.send("Not enough messages. Operation aborted (messages detected: " + str(cntr) + ").")
+            return
+        mesarr.reverse()
+        #await message.channel.send(mesarr[0].id)
+        
+        i = 0
+        i2 = 0
+        finalmessage = "Following posts have been posted successfully:\n"
+        error = False
+        while i < glimit:
+            #check if message was posted
+            if wasposted(mesarr[i].id):
+                i += 1
+                continue
+                
+                
+            #have we detected attachments?
+            if not mesarr[i].attachments:
+                i += 1
+                continue
+            else:
+                messageText, imageUrl, videoUrl, uploadername = uploadprepare(mesarr[i])
+                if not videoUrl:
+                    i += 1
+                    continue
+                
+                #if tagging system is disabled, post right away
+                if disableTags:
+                    resulturl, resultid = submit(messageText, imageUrl, videoUrl, uploadername, "")
+                    if not resultid:
+                        await message.channel.send("Unknown error - aborting. Some posts may not have been posted.")
+                        error = True
+                        break
+                    addmessageid(str(mesarr[i].id), str(resultid))
+                    finalmessage += resulturl + "\n"
+                    i += 1
+                
+                #if tagging system is enabled
+                else:
+                    i2 = i + 1
+                    if i2 >= glimit:
+                        break
+                    if mesarr[i2].attachments or not mesarr[i2].content.startswith("]tags"):
+                        i += 1
+                        tags = ""
+                    else:
+                        tags = mesarr[i2].content[6:]
+                    resulturl, resultid = submit(messageText, imageUrl, videoUrl, uploadername, tags)
+                    if not resultid:
+                        await message.channel.send("Unknown error - aborting. Some posts may not have been posted.")
+                        error = True
+                        break
+                    addmessageid(str(mesarr[i].id), str(resultid))
+                    finalmessage += resulturl + "\n"
+                    i += 2
+                    
+        if not error:
+            if finalmessage == "Following posts have been posted successfully:\n":
+                await message.channel.send("Scan finished. No new posts found.")
+            else:
+                await message.channel.send(finalmessage)
+        return
+    
     
     
     if message.content.startswith("]skip"):
