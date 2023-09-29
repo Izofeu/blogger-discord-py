@@ -6,6 +6,7 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.errors import HttpError
 import json
+import asyncio
 
 scopes = ["https://www.googleapis.com/auth/blogger"]
 
@@ -113,7 +114,7 @@ def wasposted(messageid):
     for line in posts:
         splitted = line.split(",")
         splitted = splitted[0]
-        if messageid == str(splitted):
+        if str(messageid) == str(splitted):
             posts.close()
             return True
     posts.close()
@@ -353,7 +354,7 @@ async def on_message(message):
             await message.channel.send(permerror)
             return
         # remember to do +1 to account for command submission message
-        glimit = 5
+        glimit = 21
         mesarr = []
 
         cntr = 0
@@ -417,6 +418,7 @@ async def on_message(message):
                     addmessageid(str(mesarr[i].id), str(resultid))
                     finalmessage += resulturl + "\n"
                     i += 2
+                await asyncio.sleep(5)
                     
         if not error:
             if finalmessage == "Following posts have been posted successfully:\n":
