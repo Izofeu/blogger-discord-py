@@ -1,6 +1,8 @@
 # blogger-discord-py
 A simple Python app that automatically posts videos from a listening channel to Blogger. This version of the app is dedicated for Blogger.
 
+**Opensourced at 2024.04.01 due to Discord time limiting URLs. No more updates will be released. This repo and source code is provided as-is. You'll likely have to change the code in some way to make it work.**
+
 # What is this?
 This app is a Discord bot coded in Python whose job is to create posts on a Blogger blog via links to content hosted on Discord's servers, as Discord file links are permalinks.
 
